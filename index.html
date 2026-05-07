@@ -265,7 +265,7 @@ body {
         <div class="dither"></div>
         <p class="delivered-big">delivered :)</p>
         <p class="for-you">for you</p>
-        <canvas id="flower-canvas" width="56" height="92"
+        <canvas id="flower-canvas" width="90" height="90"
           style="image-rendering:pixelated;image-rendering:crisp-edges;margin:2px 0;"></canvas>
         <div class="receipt">
           contents: 1 flower<br>
@@ -344,34 +344,28 @@ const FLOWER_S = [
   [_,M,_,_],
 ];
 
-// Big delivered flower — 14 cols × 23 rows @ 4px = 56×92px
-// Sunflower shape: 8 petals (cardinal + diagonal), filled center with texture, leafy stem
+// Big delivered flower — 18 cols × 18 rows @ 5px = 90×90px
+// 8-petal sunflower: cardinal + diagonal petals, dark ring center, M inner texture
 const FLOWER_B = [
-  // ── flower head ────────────────────────────────────────
-  [_,_,_,_,_,_,L,L,_,_,_,_,_,_],  //  0  top petal tip
-  [_,_,_,_,_,L,L,L,L,_,_,_,_,_],  //  1
-  [_,_,_,_,_,L,L,L,L,_,_,_,_,_],  //  2  top petal body
-  [_,_,L,L,L,D,D,D,D,L,L,L,_,_],  //  3  diag petals meet center ring
-  [_,L,L,L,D,D,D,D,D,D,L,L,L,_],  //  4  side petals + center
-  [L,L,L,L,D,D,M,M,D,D,L,L,L,L],  //  5  full width + center texture
-  [L,L,L,L,D,M,M,M,M,D,L,L,L,L],  //  6  center
-  [L,L,L,L,D,M,M,M,M,D,L,L,L,L],  //  7  center
-  [L,L,L,L,D,D,M,M,D,D,L,L,L,L],  //  8
-  [_,L,L,L,D,D,D,D,D,D,L,L,L,_],  //  9  side petals + center
-  [_,_,L,L,L,D,D,D,D,L,L,L,_,_],  // 10  diag petals meet center ring
-  [_,_,_,_,_,L,L,L,L,_,_,_,_,_],  // 11  bottom petal body
-  [_,_,_,_,_,L,L,L,L,_,_,_,_,_],  // 12
-  [_,_,_,_,_,_,L,L,_,_,_,_,_,_],  // 13  bottom petal tip
-  // ── stem + leaves ──────────────────────────────────────
-  [_,_,_,_,_,_,M,M,_,_,_,_,_,_],  // 14  stem
-  [_,_,_,_,M,M,M,M,_,_,_,_,_,_],  // 15  left leaf base
-  [_,_,_,M,M,_,M,M,_,_,_,_,_,_],  // 16
-  [_,_,M,M,_,_,M,M,_,_,_,_,_,_],  // 17  left leaf tip
-  [_,_,_,_,_,_,M,M,_,_,_,_,_,_],  // 18  stem
-  [_,_,_,_,_,_,M,M,_,M,M,_,_,_],  // 19  right leaf base
-  [_,_,_,_,_,_,M,M,M,M,_,_,_,_],  // 20
-  [_,_,_,_,_,_,M,M,_,_,_,_,_,_],  // 21  stem
-  [_,M,M,M,M,M,M,M,M,M,M,M,_,_],  // 22  ground/base
+  //  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
+  [_,_,_,_,_,_,_,L,L,L,L,_,_,_,_,_,_,_],  //  0  top petal tip
+  [_,_,_,_,_,_,L,L,L,L,L,L,_,_,_,_,_,_],  //  1  top petal
+  [_,_,_,_,_,_,L,L,L,L,L,L,_,_,_,_,_,_],  //  2
+  [_,_,L,L,L,_,_,L,L,L,L,_,_,L,L,L,_,_],  //  3  diag petal tips
+  [_,L,L,L,L,_,_,_,L,L,_,_,_,L,L,L,L,_],  //  4  diag petals
+  [_,L,L,L,L,D,D,D,D,D,D,D,D,L,L,L,L,_],  //  5  center ring (diag petals connect)
+  [L,L,L,L,L,D,D,D,D,D,D,D,D,L,L,L,L,L],  //  6  side petals full
+  [L,L,L,L,L,D,D,M,M,M,M,D,D,L,L,L,L,L],  //  7  center inner M block
+  [L,L,L,L,L,D,D,M,M,M,M,D,D,L,L,L,L,L],  //  8
+  [L,L,L,L,L,D,D,M,M,M,M,D,D,L,L,L,L,L],  //  9
+  [L,L,L,L,L,D,D,M,M,M,M,D,D,L,L,L,L,L],  // 10
+  [L,L,L,L,L,D,D,D,D,D,D,D,D,L,L,L,L,L],  // 11  side petals full
+  [_,L,L,L,L,D,D,D,D,D,D,D,D,L,L,L,L,_],  // 12  center ring bottom
+  [_,L,L,L,L,_,_,_,L,L,_,_,_,L,L,L,L,_],  // 13  diag petals
+  [_,_,L,L,L,_,_,L,L,L,L,_,_,L,L,L,_,_],  // 14  diag petal tips
+  [_,_,_,_,_,_,L,L,L,L,L,L,_,_,_,_,_,_],  // 15  bottom petal
+  [_,_,_,_,_,_,L,L,L,L,L,L,_,_,_,_,_,_],  // 16
+  [_,_,_,_,_,_,_,L,L,L,L,_,_,_,_,_,_,_],  // 17  bottom petal tip
 ];
 
 // ════════════════════════════════════════════════
@@ -552,21 +546,66 @@ function showDelivered() {
   growFlower();
 }
 
+let flowerPulseActive = false;
+
 function growFlower() {
   const cv  = document.getElementById('flower-canvas');
   const ctx = cv.getContext('2d');
-  ctx.clearRect(0, 0, cv.width, cv.height);
-  let row = 0;
+  ctx.imageSmoothingEnabled = false;
+  flowerPulseActive = false;
 
-  function tick() {
-    if (row >= FLOWER_B.length) return;
-    FLOWER_B[row].forEach((col, c) => {
-      if (col) { ctx.fillStyle = col; ctx.fillRect(c * 4, row * 4, 4, 4); }
-    });
-    row++;
-    setTimeout(() => requestAnimationFrame(tick), 60);
+  const W  = cv.width;   // 90
+  const H  = cv.height;  // 90
+  const cx = W / 2;
+  const cy = H / 2;
+  const maxR = Math.sqrt(cx * cx + cy * cy) + 2;
+  let r = 0;
+
+  // phase 1 — circular reveal from centre outward
+  function reveal() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.clip();
+    drawSprite(ctx, FLOWER_B, 5, 0, 0);
+    ctx.restore();
+
+    r += 3;
+    if (r < maxR) {
+      requestAnimationFrame(reveal);
+    } else {
+      ctx.clearRect(0, 0, W, H);
+      drawSprite(ctx, FLOWER_B, 5, 0, 0);
+      startFlowerPulse(cv, ctx);
+    }
   }
-  requestAnimationFrame(tick);
+  requestAnimationFrame(reveal);
+}
+
+function startFlowerPulse(cv, ctx) {
+  flowerPulseActive = true;
+  const W = cv.width, H = cv.height;
+  const cx = W / 2, cy = H / 2;
+
+  function pulse() {
+    if (!flowerPulseActive) return;
+    const t     = Date.now();
+    const scale = 1 + 0.028 * Math.sin(t / 700);
+    const angle = 0.012 * Math.sin(t / 1800);   // subtle ±0.7° rotation
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+    ctx.scale(scale, scale);
+    ctx.translate(-cx, -cy);
+    ctx.imageSmoothingEnabled = false;
+    drawSprite(ctx, FLOWER_B, 5, 0, 0);
+    ctx.restore();
+    requestAnimationFrame(pulse);
+  }
+  requestAnimationFrame(pulse);
 }
 
 // ════════════════════════════════════════════════
@@ -595,6 +634,7 @@ document.getElementById('btn-send').addEventListener('click', () => {
   if (phase === 'start') startDelivery();
 });
 document.getElementById('btn-again').addEventListener('click', () => {
+  flowerPulseActive = false;
   phase = 'start';
   showPage('page-start');
   drawStartCat();
