@@ -4,467 +4,391 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>tiny cat delivery service</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --pink:  #D9897E;
+  --brown: #A97B5A;
+  --teal:  #5B9BAF;
+  --black: #2B2218;
+  --cream: #EDE6D3;
+  --gold:  #C99B52;
+  --sky:   #C0D4E0;
 }
 
 body {
   min-height: 100vh;
-  background: #1c1a2e;
-  background-image: radial-gradient(#2a2840 1px, transparent 1px);
-  background-size: 8px 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Press Start 2P', monospace;
-  padding: 16px;
+  background: linear-gradient(to bottom, var(--pink) 55%, var(--brown) 55%);
+  background-attachment: fixed;
+  font-family: 'Nunito', sans-serif;
   overflow: hidden;
 }
 
-/* ── Device ────────────────────────────────────── */
-.device {
-  background: #c0b8a8;
-  padding: 20px 18px 36px;
-  border-radius: 6px 6px 32px 6px;
-  border: 2px solid #908878;
-  box-shadow:
-    inset 0 3px 0 #ddd8c8,
-    inset -3px -3px 0 #706860,
-    0 16px 56px rgba(0,0,0,0.7);
-  transform-origin: center center;
-}
-
-.bezel {
-  background: #0e0e08;
-  border: 4px solid #080806;
-  border-radius: 3px;
-  padding: 7px;
-  box-shadow: inset 0 0 14px rgba(0,0,0,0.95);
-}
-
-/* ── Screen ────────────────────────────────────── */
-.screen {
-  width: 320px;
-  height: 288px;
-  background: #9bbc0f;
-  position: relative;
-  overflow: hidden;
-}
-
-.screen::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent 0px, transparent 3px,
-    rgba(0,0,0,0.05) 3px, rgba(0,0,0,0.05) 4px
-  );
-  pointer-events: none;
-  z-index: 90;
-}
-
-/* ── Pages ─────────────────────────────────────── */
 .page {
-  position: absolute;
+  position: fixed;
   inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 24px;
+  gap: 16px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.35s;
+  transition: opacity 0.4s ease;
 }
 .page.active { opacity: 1; pointer-events: auto; }
 
-.dither {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(#8bac0f 1px, transparent 1px);
-  background-size: 4px 4px;
-  opacity: 0.45;
-  pointer-events: none;
-  z-index: 0;
-}
-.page > * { position: relative; z-index: 1; }
-
-/* ── Start ─────────────────────────────────────── */
-#page-start { gap: 8px; }
-
-.title-main {
-  font-size: 7px;
-  color: #0f380f;
-  text-align: center;
-  line-height: 2;
-  letter-spacing: 1px;
-}
-.title-sub {
-  font-size: 6px;
-  color: #306230;
-  text-align: center;
-  line-height: 2.2;
-  margin: 2px 0 12px;
-}
-
 .btn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: #9bbc0f;
-  background: #0f380f;
+  font-size: 0.65rem;
+  color: var(--cream);
+  background: var(--black);
   border: none;
-  padding: 10px 14px;
+  padding: 14px 26px;
   cursor: pointer;
-  box-shadow: 3px 3px 0 #000;
-  letter-spacing: 0.5px;
-  transition: background 0.1s, transform 0.08s, box-shadow 0.08s;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.35);
+  transition: transform 0.08s, box-shadow 0.08s;
+  letter-spacing: 0.04em;
+  line-height: 1;
 }
-.btn:hover  { background: #1e501e; }
-.btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #000; }
+.btn:hover  { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(0,0,0,0.35); }
+.btn:active { transform: translate(3px,3px);   box-shadow: 1px 1px 0 rgba(0,0,0,0.35); }
 
-/* ── Delivery ──────────────────────────────────── */
-#page-delivery {
-  justify-content: flex-start;
-  padding: 10px 12px;
-  gap: 0;
-}
+@keyframes blink { 0%,49%{opacity:1}50%,100%{opacity:0} }
+@keyframes bob   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
 
-.svc-header {
-  font-size: 5px;
-  color: #0f380f;
+/* ─────────────── START ─────────────── */
+.title-main {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1rem, 4vw, 1.4rem);
+  color: var(--black);
   text-align: center;
-  padding: 4px 0 6px;
-  border-bottom: 2px solid #306230;
+  line-height: 1.8;
+}
+.title-sub {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.42rem, 1.5vw, 0.55rem);
+  color: var(--black);
+  opacity: 0.45;
+  letter-spacing: 0.06em;
+}
+
+/* ─────────────── DELIVERY ─────────────── */
+#page-delivery {
+  padding: 0;
+  gap: 0;
+  justify-content: flex-start;
+}
+
+.hdr {
   width: 100%;
-  margin-bottom: 8px;
-  letter-spacing: 0.5px;
+  background: var(--black);
+  padding: 9px 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.hdr span {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.48rem;
+  color: var(--cream);
+  letter-spacing: 0.1em;
 }
 
 .track {
   width: 100%;
-  height: 96px;
   position: relative;
   overflow: hidden;
-  border: 2px solid #306230;
-  margin-bottom: 8px;
   flex-shrink: 0;
-  background: linear-gradient(to bottom, #9bbc0f 55%, #8bac0f 55%);
+  height: 210px;
+  border-bottom: 3px solid var(--black);
 }
-.track::after {
-  content: '';
+.track-sky {
   position: absolute;
-  left: 0; right: 0;
-  bottom: 12px;
-  height: 2px;
-  background: #306230;
+  top: 0; left: 0; right: 0;
+  height: 50%;
+  background: var(--sky);
+  border-bottom: 3px solid var(--black);
+}
+.track-ground {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 38%;
+  background: var(--brown);
+  border-top: 3px solid var(--black);
 }
 
 #trail-canvas {
   position: absolute;
-  top: 0; left: 0;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
 }
-#cat-canvas {
+
+/* pixel art delivery cat */
+#delivery-cat {
   position: absolute;
-  bottom: 10px;
+  bottom: 38%;
+  z-index: 4;
+  width: 52px;
+  height: auto;
   image-rendering: pixelated;
-  image-rendering: crisp-edges;
 }
 
-.status-box {
+#waiting-girl {
+  position: absolute;
+  bottom: 0;
+  right: 20px;
+  height: 112px;
+  image-rendering: pixelated;
+  z-index: 3;
+}
+
+/* status area */
+.status-area {
   width: 100%;
-  border: 2px solid #306230;
-  padding: 6px 8px;
-  background: #8bac0f;
-  margin-bottom: 8px;
+  background: var(--cream);
+  padding: 18px 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  border-bottom: 3px solid var(--black);
   flex-shrink: 0;
 }
-.status-label { font-size: 5px; color: #306230; margin-bottom: 4px; }
-.status-value { font-size: 6px; color: #0f380f; min-height: 13px; }
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: #8bac0f;
-  border: 2px solid #306230;
-  overflow: hidden;
-  flex-shrink: 0;
+.status-lbl {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.38rem;
+  color: var(--black);
+  opacity: 0.4;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
-.progress-fill {
-  height: 100%;
-  background: #0f380f;
-  width: 0%;
-  transition: width 0.9s ease;
+.status-msg {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--black);
+  line-height: 1.8;
 }
+.cur { animation: blink 1s step-end infinite; }
 
-/* ── Delivered ─────────────────────────────────── */
-#page-delivered { gap: 4px; }
+.pip-row { display: flex; gap: 5px; }
+.pip {
+  width: 13px; height: 13px;
+  border: 2px solid var(--black);
+  background: var(--cream);
+}
+.pip.done { background: var(--gold); }
+.pip.now  { background: var(--teal); animation: blink 0.75s step-end infinite; }
 
-.delivered-big { font-size: 9px; color: #0f380f; text-align: center; }
-.for-you       { font-size: 7px; color: #306230; }
+/* ─────────────── DELIVERED ─────────────── */
+.delivered-big {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1rem, 4.5vw, 1.6rem);
+  color: var(--black);
+  text-align: center;
+  line-height: 1.8;
+}
+.for-you {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: var(--black);
+  opacity: 0.45;
+  letter-spacing: 0.07em;
+}
+.delivered-girl {
+  width: clamp(110px, 32vw, 170px);
+  image-rendering: pixelated;
+  display: block;
+  mix-blend-mode: multiply;
+}
 .receipt {
-  font-size: 5px;
-  color: #306230;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.48rem;
+  color: var(--black);
   text-align: center;
   line-height: 2.4;
-  padding: 6px 10px;
-  border: 2px solid #306230;
-  margin-top: 2px;
+  padding: 13px 22px;
+  border: 3px solid var(--black);
+  background: var(--cream);
+  box-shadow: 4px 4px 0 var(--black);
 }
-
-/* ── Blink ─────────────────────────────────────── */
-@keyframes blink {
-  0%,100% { opacity:1; }
-  50%      { opacity:0; }
-}
-.blink { animation: blink 1s step-end infinite; }
 </style>
 </head>
 <body>
 
-<div class="device" id="device">
-  <div class="bezel">
-    <div class="screen">
+<!-- ═══ START ═══════════════════════════════════════ -->
+<div class="page active" id="page-start">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 26"
+       style="width:clamp(90px,28vw,130px);height:auto;image-rendering:pixelated;animation:bob 1.2s ease-in-out infinite">
+    <rect fill="#3a3028" x="2"  y="0"  width="3" height="4"/>
+    <rect fill="#3a3028" x="13" y="0"  width="3" height="4"/>
+    <rect fill="#4a3c2e" x="3"  y="1"  width="1" height="2"/>
+    <rect fill="#4a3c2e" x="14" y="1"  width="1" height="2"/>
+    <rect fill="#2B2218" x="1"  y="3"  width="16" height="10"/>
+    <rect fill="#EDE6D3" x="3"  y="5"  width="4" height="4"/>
+    <rect fill="#2B2218" x="4"  y="6"  width="2" height="3"/>
+    <rect fill="#EDE6D3" x="11" y="5"  width="4" height="4"/>
+    <rect fill="#2B2218" x="12" y="6"  width="2" height="3"/>
+    <rect fill="#D98888" x="8"  y="10" width="2" height="2"/>
+    <rect fill="#5B9BAF" x="2"  y="13" width="14" height="8"/>
+    <rect fill="#EDE6D3" x="6"  y="14" width="1" height="6"/>
+    <rect fill="#EDE6D3" x="8"  y="14" width="1" height="6"/>
+    <rect fill="#EDE6D3" x="10" y="14" width="1" height="6"/>
+    <rect fill="#2B2218" x="3"  y="21" width="4" height="5"/>
+    <rect fill="#2B2218" x="11" y="21" width="4" height="5"/>
+    <rect fill="#2B2218" x="2"  y="24" width="5" height="2"/>
+    <rect fill="#2B2218" x="11" y="24" width="5" height="2"/>
+  </svg>
+  <p class="title-main">tiny cat<br>delivery</p>
+  <p class="title-sub">1 flower · ready to send</p>
+  <button class="btn" id="btn-send">send flower</button>
+</div>
 
-      <!-- START -->
-      <div class="page active" id="page-start">
-        <div class="dither"></div>
-        <canvas id="start-cat" width="80" height="64"
-          style="image-rendering:pixelated;margin-bottom:10px;"></canvas>
-        <p class="title-main">TINY CAT<br>DELIVERY SERVICE</p>
-        <p class="title-sub">1 flower<br>ready to send</p>
-        <button class="btn" id="btn-send">send flower</button>
-      </div>
+<!-- ═══ DELIVERY ════════════════════════════════════ -->
+<div class="page" id="page-delivery">
+  <div class="hdr"><span>▸ tiny cat delivery service ◂</span></div>
 
-      <!-- DELIVERY -->
-      <div class="page" id="page-delivery">
-        <p class="svc-header">▶ TINY CAT DELIVERY SERVICE ◀</p>
-        <div class="track" id="track">
-          <canvas id="trail-canvas" width="320" height="96"></canvas>
-          <canvas id="cat-canvas"   width="80"  height="80"></canvas>
-        </div>
-        <div class="status-box">
-          <div class="status-label">STATUS:</div>
-          <div class="status-value" id="status-text">
-            packing flower<span class="blink">_</span>
-          </div>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill"></div>
-        </div>
-      </div>
+  <div class="track" id="track">
+    <div class="track-sky"></div>
+    <div class="track-ground"></div>
+    <canvas id="trail-canvas"></canvas>
 
-      <!-- DELIVERED -->
-      <div class="page" id="page-delivered">
-        <div class="dither"></div>
-        <p class="delivered-big">delivered :)</p>
-        <p class="for-you">for you</p>
-        <canvas id="flower-canvas" width="90" height="90"
-          style="image-rendering:pixelated;image-rendering:crisp-edges;margin:2px 0;"></canvas>
-        <div class="receipt">
-          contents: 1 flower<br>
-          delivery method: cat
-        </div>
-        <button class="btn" id="btn-again"
-          style="margin-top:6px;font-size:6px;">send again</button>
-      </div>
+    <svg id="delivery-cat" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 26"
+         style="image-rendering:pixelated">
+      <!-- ears -->
+      <rect fill="#3a3028" x="2"  y="0"  width="3" height="4"/>
+      <rect fill="#3a3028" x="13" y="0"  width="3" height="4"/>
+      <rect fill="#4a3c2e" x="3"  y="1"  width="1" height="2"/>
+      <rect fill="#4a3c2e" x="14" y="1"  width="1" height="2"/>
+      <!-- head -->
+      <rect fill="#2B2218" x="1"  y="3"  width="16" height="10"/>
+      <!-- eyes -->
+      <rect fill="#EDE6D3" x="3"  y="5"  width="4" height="4"/>
+      <rect fill="#2B2218" x="4"  y="6"  width="2" height="3"/>
+      <rect fill="#EDE6D3" x="11" y="5"  width="4" height="4"/>
+      <rect fill="#2B2218" x="12" y="6"  width="2" height="3"/>
+      <!-- nose -->
+      <rect fill="#D98888" x="8"  y="10" width="2" height="2"/>
+      <!-- sweater -->
+      <rect fill="#5B9BAF" x="2"  y="13" width="14" height="8"/>
+      <rect fill="#EDE6D3" x="6"  y="14" width="1" height="6"/>
+      <rect fill="#EDE6D3" x="8"  y="14" width="1" height="6"/>
+      <rect fill="#EDE6D3" x="10" y="14" width="1" height="6"/>
+      <!-- legs A -->
+      <g id="legs-a">
+        <rect fill="#2B2218" x="3"  y="21" width="4" height="5"/>
+        <rect fill="#2B2218" x="11" y="21" width="4" height="5"/>
+        <rect fill="#2B2218" x="2"  y="24" width="5" height="2"/>
+        <rect fill="#2B2218" x="11" y="24" width="5" height="2"/>
+      </g>
+      <!-- legs B -->
+      <g id="legs-b" style="display:none">
+        <rect fill="#2B2218" x="2"  y="22" width="4" height="4"/>
+        <rect fill="#2B2218" x="12" y="20" width="4" height="6"/>
+        <rect fill="#2B2218" x="1"  y="25" width="5" height="2"/>
+        <rect fill="#2B2218" x="12" y="25" width="5" height="2"/>
+      </g>
+      <!-- carried flower -->
+      <g id="carried-flower">
+        <rect fill="#C99B52" x="15" y="0"  width="3" height="3"/>
+        <rect fill="#C99B52" x="14" y="1"  width="5" height="1"/>
+        <rect fill="#7B4F30" x="15" y="1"  width="1" height="1"/>
+        <rect fill="#5a8a3a" x="16" y="3"  width="1" height="4"/>
+      </g>
+    </svg>
 
+    <img id="waiting-girl" src="IMG_0463.PNG" alt="">
+  </div>
+
+  <div class="status-area">
+    <div class="status-lbl">status</div>
+    <div class="status-msg" id="status-text">packing flower<span class="cur">_</span></div>
+    <div class="pip-row">
+      <div class="pip" id="pip-0"></div>
+      <div class="pip" id="pip-1"></div>
+      <div class="pip" id="pip-2"></div>
+      <div class="pip" id="pip-3"></div>
+      <div class="pip" id="pip-4"></div>
+      <div class="pip" id="pip-5"></div>
+      <div class="pip" id="pip-6"></div>
     </div>
   </div>
+</div>
+
+<!-- ═══ DELIVERED ═══════════════════════════════════ -->
+<div class="page" id="page-delivered">
+  <p class="delivered-big">delivered<br>:)</p>
+  <p class="for-you">for you</p>
+  <img class="delivered-girl" id="delivered-girl" src="DFAC3C11-B660-4CF7-B1AE-D940EF714C67.PNG" alt="">
+  <div class="receipt">contents: 1 flower<br>courier: cat</div>
+  <button class="btn" id="btn-again">send again</button>
 </div>
 
 <script>
 'use strict';
 
-// ════════════════════════════════════════════════
-// PALETTE  — Game Boy greens + rainbow for trail
-// ════════════════════════════════════════════════
-const D = '#0f380f';   // darkest  — outline, head, legs
-const M = '#306230';   // mid-dark — body fill
-const L = '#8bac0f';   // mid-light — sprinkles / flower petals
-const X = '#9bbc0f';   // lightest  — eye gleam
-const _ = null;
+const RAINBOW = ['#b05868','#b07040','#a09040','#4a7850','#3f6890','#724880'];
+const STRIPE_H = 6;
 
-// ════════════════════════════════════════════════
-// CAT SPRITE  — Nyan-Cat-inspired pop-tart body
-// 20 cols × 16 rows @ 4px = 80×64 canvas
-// ════════════════════════════════════════════════
-
-// Shared head + body (rows 0–11)
-const CAT_UPPER = [
-  [_,_,D,_,_,_,_,D,_,_,_,_,_,_,_,_,_,_,_,_],  // 0  ear peaks
-  [_,D,D,D,_,_,D,D,D,_,_,_,_,_,_,_,_,_,_,_],  // 1  ear bases
-  [D,D,D,D,D,D,D,D,D,D,_,_,_,_,_,_,_,_,_,_],  // 2  head
-  [D,D,D,D,D,D,D,D,D,D,D,_,_,_,_,_,_,_,_,_],  // 3  head wide
-  [D,X,D,D,D,D,X,D,D,D,D,_,_,_,_,_,_,_,_,_],  // 4  eyes  (X=gleam)
-  [D,D,D,D,D,D,D,D,D,D,D,_,_,_,_,_,_,_,_,_],  // 5  muzzle
-  // pop-tart body: D border, M fill, L = frosting sprinkles
-  [_,D,M,M,M,M,M,M,M,M,M,D,D,D,D,D,D,_,_,_],  // 6  body top border
-  [_,D,M,L,M,M,L,M,M,L,M,M,M,M,M,M,D,_,_,_],  // 7  sprinkle row
-  [_,D,M,M,M,M,M,M,M,M,M,M,M,M,M,M,D,_,_,_],  // 8  body
-  [_,D,M,M,L,M,M,M,L,M,M,M,M,M,M,M,D,_,_,D],  // 9  sprinkle row + tail tip
-  [_,D,M,M,M,M,M,M,M,M,M,M,M,M,M,M,D,_,D,_],  // 10 body + tail
-  [_,_,D,D,D,D,D,D,D,D,D,D,D,D,D,D,_,D,_,_],  // 11 body bottom + tail curl
-];
-
-const LEGS_A = [
-  [_,_,D,_,_,_,_,D,D,_,_,_,_,_,_,_,_,_,_,_],  // 12
-  [_,_,D,_,_,_,_,D,D,_,_,_,_,_,_,_,_,_,_,_],  // 13
-  [_,D,D,D,_,_,D,D,D,D,_,_,_,_,_,_,_,_,_,_],  // 14 paws
-  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],  // 15 empty
-];
-const LEGS_B = [
-  [_,D,_,_,_,_,_,_,D,_,_,_,_,_,_,_,_,_,_,_],  // 12 stride
-  [D,D,_,_,_,_,_,_,D,D,_,_,_,_,_,_,_,_,_,_],  // 13
-  [D,_,_,_,_,_,_,_,_,D,_,_,_,_,_,_,_,_,_,_],  // 14 paws spread
-  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],  // 15 empty
-];
-
-const CAT = [
-  [...CAT_UPPER, ...LEGS_A],
-  [...CAT_UPPER, ...LEGS_B],
-];
-
-// ════════════════════════════════════════════════
-// FLOWER SPRITES
-// ════════════════════════════════════════════════
-
-// Small carried flower — 4 cols × 5 rows @ 3px
-const FLOWER_S = [
-  [_,L,_,_],
-  [L,D,L,_],
-  [_,L,_,_],
-  [_,M,_,_],
-  [_,M,_,_],
-];
-
-// Big delivered flower — 18 cols × 18 rows @ 5px = 90×90px
-// 8-petal sunflower: cardinal + diagonal petals, dark ring center, M inner texture
-const FLOWER_B = [
-  //  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
-  [_,_,_,_,_,_,_,L,L,L,L,_,_,_,_,_,_,_],  //  0  top petal tip
-  [_,_,_,_,_,_,L,L,L,L,L,L,_,_,_,_,_,_],  //  1  top petal
-  [_,_,_,_,_,_,L,L,L,L,L,L,_,_,_,_,_,_],  //  2
-  [_,_,L,L,L,_,_,L,L,L,L,_,_,L,L,L,_,_],  //  3  diag petal tips
-  [_,L,L,L,L,_,_,_,L,L,_,_,_,L,L,L,L,_],  //  4  diag petals
-  [_,L,L,L,L,D,D,D,D,D,D,D,D,L,L,L,L,_],  //  5  center ring (diag petals connect)
-  [L,L,L,L,L,D,D,D,D,D,D,D,D,L,L,L,L,L],  //  6  side petals full
-  [L,L,L,L,L,D,D,M,M,M,M,D,D,L,L,L,L,L],  //  7  center inner M block
-  [L,L,L,L,L,D,D,M,M,M,M,D,D,L,L,L,L,L],  //  8
-  [L,L,L,L,L,D,D,M,M,M,M,D,D,L,L,L,L,L],  //  9
-  [L,L,L,L,L,D,D,M,M,M,M,D,D,L,L,L,L,L],  // 10
-  [L,L,L,L,L,D,D,D,D,D,D,D,D,L,L,L,L,L],  // 11  side petals full
-  [_,L,L,L,L,D,D,D,D,D,D,D,D,L,L,L,L,_],  // 12  center ring bottom
-  [_,L,L,L,L,_,_,_,L,L,_,_,_,L,L,L,L,_],  // 13  diag petals
-  [_,_,L,L,L,_,_,L,L,L,L,_,_,L,L,L,_,_],  // 14  diag petal tips
-  [_,_,_,_,_,_,L,L,L,L,L,L,_,_,_,_,_,_],  // 15  bottom petal
-  [_,_,_,_,_,_,L,L,L,L,L,L,_,_,_,_,_,_],  // 16
-  [_,_,_,_,_,_,_,L,L,L,L,_,_,_,_,_,_,_],  // 17  bottom petal tip
-];
-
-// ════════════════════════════════════════════════
-// RAINBOW TRAIL  (colours + y positions in track)
-// Cat body lives at track y ≈ 46–70 → 6 stripes × 4px
-// ════════════════════════════════════════════════
-const RAINBOW = [
-  { c: '#ff4466', y: 46 },
-  { c: '#ff8c00', y: 50 },
-  { c: '#ffe600', y: 54 },
-  { c: '#33cc44', y: 58 },
-  { c: '#4499ff', y: 62 },
-  { c: '#cc44ff', y: 66 },
-];
-
-// Fixed star positions (x, y) in track — sparkle effect
-const STARS = [
-  [14, 14], [52, 32], [88, 8], [148, 40], [198, 12], [240, 28], [268, 18]
-];
-
-// ════════════════════════════════════════════════
-// DRAW HELPERS
-// ════════════════════════════════════════════════
-function drawSprite(ctx, sprite, scale, ox, oy) {
-  ox = ox || 0; oy = oy || 0;
-  for (let r = 0; r < sprite.length; r++) {
-    for (let c = 0; c < sprite[r].length; c++) {
-      const col = sprite[r][c];
-      if (col) {
-        ctx.fillStyle = col;
-        ctx.fillRect(ox + c * scale, oy + r * scale, scale, scale);
-      }
-    }
-  }
-}
-
-function drawStar(ctx, x, y) {
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(x,     y - 3, 2, 8);  // vertical
-  ctx.fillRect(x - 3, y,     8, 2);  // horizontal
-}
-
-// ════════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════════
 let phase = 'start';
-let raf = null;
-let startTime = 0;
-
-let catX = -80;
-const DEST_X   = 108;
-const SPEED    = 0.82;
-
-let walkFrame = 0;
-let walkTick  = 0;
+let raf = null, startTime = 0;
+let catX = 0, destX = 0;
+let walkFrame = 0, walkTick = 0;
 const WALK_INT = 6;
+const SPEED = 1.1;
 
 const STEPS = [
-  { at:    0, text: 'packing flower...',         pct:  8 },
-  { at:  600, text: 'cat dispatched...',          pct: 28 },
-  { at: 1700, text: 'crossing the distance...',  pct: 55 },
-  { at: 3000, text: 'almost there...',            pct: 82 },
+  { at:    0, text: 'packing flower',        pips: 1 },
+  { at:  600, text: 'cat dispatched',        pips: 2 },
+  { at: 1700, text: 'crossing the distance', pips: 4 },
+  { at: 3000, text: 'almost there',          pips: 6 },
 ];
 let lastStep = -1;
 
-// ════════════════════════════════════════════════
-// PAGES
-// ════════════════════════════════════════════════
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// ════════════════════════════════════════════════
-// START SCREEN
-// ════════════════════════════════════════════════
-function drawStartCat() {
-  const cv  = document.getElementById('start-cat');
-  const ctx = cv.getContext('2d');
-  ctx.clearRect(0, 0, cv.width, cv.height);
-  drawSprite(ctx, CAT[0], 4);
+function setPips(count) {
+  for (let i = 0; i < 7; i++) {
+    const pip = document.getElementById('pip-' + i);
+    pip.className = 'pip';
+    if (i < count - 1)    pip.classList.add('done');
+    else if (i === count - 1) pip.classList.add('now');
+  }
 }
 
-// ════════════════════════════════════════════════
-// DELIVERY LOOP
-// ════════════════════════════════════════════════
 function startDelivery() {
-  phase     = 'delivering';
-  catX      = -80;
-  walkFrame = 0;
-  walkTick  = 0;
-  lastStep  = -1;
-  startTime = performance.now();
+  phase = 'delivering';
+  catX  = -60;
+  walkFrame = 0; walkTick = 0; lastStep = -1;
 
   document.getElementById('status-text').innerHTML =
-    'packing flower<span class="blink">_</span>';
-  document.getElementById('progress-fill').style.width = '0%';
+    'packing flower<span class="cur">_</span>';
+  document.getElementById('carried-flower').style.display = '';
+  document.getElementById('legs-a').style.display        = '';
+  document.getElementById('legs-b').style.display        = 'none';
+  setPips(1);
 
+  // show page first so layout is live before measuring
   showPage('page-delivery');
+
+  const track  = document.getElementById('track');
+  const canvas = document.getElementById('trail-canvas');
+  canvas.width  = track.offsetWidth;
+  canvas.height = track.offsetHeight;
+
+  // measure girl width from natural image dimensions if loaded, else fallback
+  const girl  = document.getElementById('waiting-girl');
+  const girlW = girl.naturalWidth > 0
+    ? Math.round(girl.offsetHeight * girl.naturalWidth / girl.naturalHeight)
+    : 54;
+  destX = track.offsetWidth - girlW - 20 - 65;
+
+  startTime = performance.now();
   if (raf) cancelAnimationFrame(raf);
   raf = requestAnimationFrame(loop);
 }
@@ -472,64 +396,52 @@ function startDelivery() {
 function loop(now) {
   const elapsed = now - startTime;
 
-  // ── status / progress ──────────────────────
   for (let i = STEPS.length - 1; i >= 0; i--) {
     if (elapsed >= STEPS[i].at) {
       if (i !== lastStep) {
         lastStep = i;
         document.getElementById('status-text').innerHTML =
-          STEPS[i].text + '<span class="blink">_</span>';
-        document.getElementById('progress-fill').style.width = STEPS[i].pct + '%';
+          STEPS[i].text + '<span class="cur">_</span>';
+        setPips(STEPS[i].pips);
       }
       break;
     }
   }
 
-  // ── move cat ───────────────────────────────
-  const arrived = catX >= DEST_X;
+  const arrived = catX >= destX;
   if (!arrived) {
-    catX = Math.min(catX + SPEED, DEST_X);
+    catX = Math.min(catX + SPEED, destX);
     walkTick++;
-    if (walkTick % WALK_INT === 0) walkFrame ^= 1;
+    if (walkTick % WALK_INT === 0) {
+      walkFrame ^= 1;
+      document.getElementById('legs-a').style.display = walkFrame === 0 ? '' : 'none';
+      document.getElementById('legs-b').style.display = walkFrame === 1 ? '' : 'none';
+    }
   }
 
-  // ── draw trail canvas ──────────────────────
-  const trailCv  = document.getElementById('trail-canvas');
-  const trailCtx = trailCv.getContext('2d');
-  trailCtx.clearRect(0, 0, trailCv.width, trailCv.height);
+  document.getElementById('carried-flower').style.display = arrived ? 'none' : '';
 
-  // rainbow stripes from left edge to cat
-  const trailEnd = Math.max(0, catX + 4); // slight overlap under cat
+  const canvas = document.getElementById('trail-canvas');
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const trailEnd = Math.max(0, catX + 10);
+
+  ctx.clearRect(0, 0, W, H);
   if (trailEnd > 0) {
-    RAINBOW.forEach(({ c, y }) => {
-      trailCtx.fillStyle = c;
-      trailCtx.fillRect(0, y, trailEnd, 4);
+    const groundTop = Math.round(H * 0.62);
+    const baseY     = groundTop - STRIPE_H * RAINBOW.length;
+    RAINBOW.forEach((c, i) => {
+      ctx.fillStyle = c;
+      ctx.fillRect(0, baseY + i * STRIPE_H, trailEnd, STRIPE_H);
     });
   }
 
-  // sparkle stars (twinkle every other walk frame)
-  if (elapsed > 600 && walkFrame === 0) {
-    STARS.forEach(([sx, sy]) => {
-      if (sx < trailEnd - 12) drawStar(trailCtx, sx, sy);
-    });
-  }
+  document.getElementById('delivery-cat').style.left = Math.round(catX) + 'px';
 
-  // ── draw cat canvas ────────────────────────
-  const catCv  = document.getElementById('cat-canvas');
-  const catCtx = catCv.getContext('2d');
-  catCtx.clearRect(0, 0, catCv.width, catCv.height);
-  // y=16 reserves top 16px for carried flower
-  drawSprite(catCtx, CAT[walkFrame], 4, 0, 16);
-  if (!arrived) drawSprite(catCtx, FLOWER_S, 3, 10, 1);
-
-  catCv.style.left = Math.round(catX) + 'px';
-
-  // ── arrival ────────────────────────────────
   if (arrived && elapsed >= 4000) {
-    cancelAnimationFrame(raf);
-    raf = null;
+    cancelAnimationFrame(raf); raf = null;
     document.getElementById('status-text').innerHTML = 'delivered.';
-    document.getElementById('progress-fill').style.width = '100%';
+    setPips(7);
     setTimeout(showDelivered, 700);
     return;
   }
@@ -537,111 +449,27 @@ function loop(now) {
   raf = requestAnimationFrame(loop);
 }
 
-// ════════════════════════════════════════════════
-// DELIVERED SCREEN
-// ════════════════════════════════════════════════
 function showDelivered() {
   phase = 'delivered';
   showPage('page-delivered');
-  growFlower();
+  const el = document.getElementById('delivered-girl');
+  el.style.transition = 'none';
+  el.style.clipPath   = 'inset(100% 0 0 0)';
+  el.getBoundingClientRect();
+  el.style.transition = 'clip-path 0.55s ease-out';
+  el.style.clipPath   = 'inset(0% 0 0 0)';
 }
 
-let flowerPulseActive = false;
-
-function growFlower() {
-  const cv  = document.getElementById('flower-canvas');
-  const ctx = cv.getContext('2d');
-  ctx.imageSmoothingEnabled = false;
-  flowerPulseActive = false;
-
-  const W  = cv.width;   // 90
-  const H  = cv.height;  // 90
-  const cx = W / 2;
-  const cy = H / 2;
-  const maxR = Math.sqrt(cx * cx + cy * cy) + 2;
-  let r = 0;
-
-  // phase 1 — circular reveal from centre outward
-  function reveal() {
-    ctx.clearRect(0, 0, W, H);
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.clip();
-    drawSprite(ctx, FLOWER_B, 5, 0, 0);
-    ctx.restore();
-
-    r += 3;
-    if (r < maxR) {
-      requestAnimationFrame(reveal);
-    } else {
-      ctx.clearRect(0, 0, W, H);
-      drawSprite(ctx, FLOWER_B, 5, 0, 0);
-      startFlowerPulse(cv, ctx);
-    }
-  }
-  requestAnimationFrame(reveal);
-}
-
-function startFlowerPulse(cv, ctx) {
-  flowerPulseActive = true;
-  const W = cv.width, H = cv.height;
-  const cx = W / 2, cy = H / 2;
-
-  function pulse() {
-    if (!flowerPulseActive) return;
-    const t     = Date.now();
-    const scale = 1 + 0.028 * Math.sin(t / 700);
-    const angle = 0.012 * Math.sin(t / 1800);   // subtle ±0.7° rotation
-
-    ctx.clearRect(0, 0, W, H);
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(angle);
-    ctx.scale(scale, scale);
-    ctx.translate(-cx, -cy);
-    ctx.imageSmoothingEnabled = false;
-    drawSprite(ctx, FLOWER_B, 5, 0, 0);
-    ctx.restore();
-    requestAnimationFrame(pulse);
-  }
-  requestAnimationFrame(pulse);
-}
-
-// ════════════════════════════════════════════════
-// RESPONSIVE SCALING
-// ════════════════════════════════════════════════
-function fitToScreen() {
-  const el = document.getElementById('device');
-  el.style.transform = 'scale(1)';
-  const dw = el.offsetWidth;
-  const dh = el.offsetHeight;
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const isMobile = vw <= 640;
-  const pad = isMobile ? 0 : 40;
-  const raw = Math.min((vw - pad * 2) / dw, (vh - pad * 2) / dh);
-  const scale = isMobile ? Math.min(raw, 3) : Math.min(raw, 1.6);
-  el.style.transform = `scale(${scale})`;
-}
-
-window.addEventListener('resize', fitToScreen);
-
-// ════════════════════════════════════════════════
-// WIRING
-// ════════════════════════════════════════════════
 document.getElementById('btn-send').addEventListener('click', () => {
   if (phase === 'start') startDelivery();
 });
-document.getElementById('btn-again').addEventListener('click', () => {
-  flowerPulseActive = false;
-  phase = 'start';
-  showPage('page-start');
-  drawStartCat();
-});
 
-drawStartCat();
-fitToScreen();
+document.getElementById('btn-again').addEventListener('click', () => {
+  phase = 'start';
+  const el = document.getElementById('delivered-girl');
+  el.style.clipPath = el.style.transition = '';
+  showPage('page-start');
+});
 </script>
 </body>
 </html>
