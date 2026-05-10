@@ -214,6 +214,20 @@ body {
   background: var(--cream);
   box-shadow: 4px 4px 0 var(--black);
 }
+.countdown {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: var(--cream);
+  background: var(--black);
+  padding: 10px 18px;
+  border: 3px solid var(--black);
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+  line-height: 1.8;
+  text-align: center;
+}
+.countdown span {
+  color: var(--gold);
+}
 </style>
 </head>
 <body>
@@ -323,6 +337,7 @@ body {
   <p class="for-you">for you</p>
   <img class="delivered-girl" id="delivered-girl" src="DFAC3C11-B660-4CF7-B1AE-D940EF714C67.PNG" alt="">
   <div class="receipt">contents: 1 flower<br>courier: cat</div>
+  <div class="countdown">days until we meet: <span id="days-count"></span></div>
   <button class="btn" id="btn-again">send again</button>
 </div>
 
@@ -449,9 +464,18 @@ function loop(now) {
   raf = requestAnimationFrame(loop);
 }
 
+function daysUntilMeeting() {
+  const target = new Date('2026-05-15T00:00:00');
+  const now    = new Date();
+  const diff   = target - now;
+  if (diff <= 0) return 0;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
 function showDelivered() {
   phase = 'delivered';
   showPage('page-delivered');
+  document.getElementById('days-count').textContent = daysUntilMeeting();
   const el = document.getElementById('delivered-girl');
   el.style.transition = 'none';
   el.style.clipPath   = 'inset(100% 0 0 0)';
