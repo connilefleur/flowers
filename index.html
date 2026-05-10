@@ -357,11 +357,11 @@ const RAINBOW = ['#b05868','#b07040','#a09040','#4a7850','#3f6890','#724880'];
 const STRIPE_H = 6;
 
 let phase = 'start';
-let raf = null, startTime = 0;
+let raf = null, startTime = 0, lastFrame = 0;
 let catX = 0, destX = 0;
-let walkFrame = 0, walkTick = 0;
-const WALK_INT = 6;
-const SPEED = 1.1;
+let walkFrame = 0, walkMs = 0;
+const WALK_INTERVAL = 100; // ms between leg swaps
+const SPEED = 0.065;       // px per ms (~65px/s)
 
 const STEPS = [
   { at:    0, text: 'packing flower',        pips: 1 },
@@ -388,7 +388,7 @@ function setPips(count) {
 function startDelivery() {
   phase = 'delivering';
   catX  = -60;
-  walkFrame = 0; walkTick = 0; lastStep = -1;
+  walkFrame = 0; walkMs = 0; lastStep = -1;
 
   document.getElementById('status-text').innerHTML =
     'packing flower<span class="cur">_</span>';
@@ -412,13 +412,15 @@ function startDelivery() {
     : 54;
   destX = track.offsetWidth - girlW - 20 - 65;
 
-  startTime = performance.now();
+  startTime = lastFrame = performance.now();
   if (raf) cancelAnimationFrame(raf);
   raf = requestAnimationFrame(loop);
 }
 
 function loop(now) {
   const elapsed = now - startTime;
+  const dt = Math.min(now - lastFrame, 64); // cap at ~1 dropped frame
+  lastFrame = now;
 
   for (let i = STEPS.length - 1; i >= 0; i--) {
     if (elapsed >= STEPS[i].at) {
@@ -434,9 +436,10 @@ function loop(now) {
 
   const arrived = catX >= destX;
   if (!arrived) {
-    catX = Math.min(catX + SPEED, destX);
-    walkTick++;
-    if (walkTick % WALK_INT === 0) {
+    catX = Math.min(catX + SPEED * dt, destX);
+    walkMs += dt;
+    if (walkMs >= WALK_INTERVAL) {
+      walkMs -= WALK_INTERVAL;
       walkFrame ^= 1;
       document.getElementById('legs-a').style.display = walkFrame === 0 ? '' : 'none';
       document.getElementById('legs-b').style.display = walkFrame === 1 ? '' : 'none';
