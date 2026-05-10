@@ -201,7 +201,6 @@ body {
   width: clamp(110px, 32vw, 170px);
   image-rendering: pixelated;
   display: block;
-  mix-blend-mode: multiply;
 }
 .receipt {
   font-family: 'Press Start 2P', monospace;
@@ -216,17 +215,24 @@ body {
 }
 .countdown {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.55rem;
+  font-size: 0.5rem;
   color: var(--cream);
   background: var(--black);
-  padding: 10px 18px;
+  padding: 16px 24px 20px;
   border: 3px solid var(--black);
   box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
-  line-height: 1.8;
+  line-height: 1.6;
   text-align: center;
+  letter-spacing: 0.05em;
 }
-.countdown span {
+.countdown-number {
+  display: block;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(2.8rem, 14vw, 4.5rem);
   color: var(--gold);
+  line-height: 1;
+  margin: 8px 0 4px;
+  text-shadow: 4px 4px 0 rgba(0,0,0,0.4);
 }
 </style>
 </head>
@@ -337,7 +343,10 @@ body {
   <p class="for-you">for you</p>
   <img class="delivered-girl" id="delivered-girl" src="DFAC3C11-B660-4CF7-B1AE-D940EF714C67.PNG" alt="">
   <div class="receipt">contents: 1 flower<br>courier: cat</div>
-  <div class="countdown">days until we meet: <span id="days-count"></span></div>
+  <div class="countdown">
+    days until we meet
+    <span class="countdown-number" id="days-count"></span>
+  </div>
   <button class="btn" id="btn-again">send again</button>
 </div>
 
@@ -483,6 +492,26 @@ function showDelivered() {
   el.style.transition = 'clip-path 0.55s ease-out';
   el.style.clipPath   = 'inset(0% 0 0 0)';
 }
+
+function stripWhite(img) {
+  const c = document.createElement('canvas');
+  c.width = img.naturalWidth; c.height = img.naturalHeight;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const d = ctx.getImageData(0, 0, c.width, c.height);
+  for (let i = 0; i < d.data.length; i += 4) {
+    if (d.data[i] > 240 && d.data[i+1] > 240 && d.data[i+2] > 240)
+      d.data[i+3] = 0;
+  }
+  ctx.putImageData(d, 0, 0);
+  img.src = c.toDataURL();
+}
+
+['waiting-girl','delivered-girl'].forEach(id => {
+  const img = document.getElementById(id);
+  if (img.complete && img.naturalWidth) stripWhite(img);
+  else img.addEventListener('load', () => stripWhite(img));
+});
 
 document.getElementById('btn-send').addEventListener('click', () => {
   if (phase === 'start') startDelivery();
